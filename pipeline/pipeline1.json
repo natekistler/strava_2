@@ -1,0 +1,573 @@
+{
+	"name": "pipeline1",
+	"properties": {
+		"activities": [
+			{
+				"name": "GetBearerToken",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": "https://www.strava.com/oauth/token?",
+					"method": "POST",
+					"headers": {
+						"Content-Type": "application/x-www-form-urlencoded"
+					},
+					"body": "grant_type=refresh_token&client_id=42399&client_secret=750191abe2d99529b503cbfe70b86ad8f3d8ae70&refresh_token=4053c255fe9432ade612c43f4bf83f59f3153316"
+				}
+			},
+			{
+				"name": "GetStravaData",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "GetBearerToken",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "RestSource",
+						"httpRequestTimeout": "00:01:40",
+						"requestInterval": "00.00:00:00.010",
+						"requestMethod": "GET",
+						"additionalHeaders": {
+							"Authorization": {
+								"value": "Bearer @{activity('GetBearerToken').output.access_token}",
+								"type": "Expression"
+							}
+						},
+						"paginationRules": {
+							"AbsoluteURL": "$.d.__next"
+						}
+					},
+					"sink": {
+						"type": "JsonSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "JsonWriteSettings",
+							"quoteAllText": true
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "$['athlete']['id']"
+								},
+								"sink": {
+									"name": "athlete_id"
+								}
+							},
+							{
+								"source": {
+									"path": "$['name']"
+								},
+								"sink": {
+									"name": "name"
+								}
+							},
+							{
+								"source": {
+									"path": "$['distance']"
+								},
+								"sink": {
+									"name": "distance"
+								}
+							},
+							{
+								"source": {
+									"path": "$['moving_time']"
+								},
+								"sink": {
+									"name": "moving_time"
+								}
+							},
+							{
+								"source": {
+									"path": "$['elapsed_time']"
+								},
+								"sink": {
+									"name": "elapsed_time"
+								}
+							},
+							{
+								"source": {
+									"path": "$['total_elevation_gain']"
+								},
+								"sink": {
+									"name": "total_elevation_gain"
+								}
+							},
+							{
+								"source": {
+									"path": "$['type']"
+								},
+								"sink": {
+									"name": "type"
+								}
+							},
+							{
+								"source": {
+									"path": "$['workout_type']"
+								},
+								"sink": {
+									"name": "workout_type"
+								}
+							},
+							{
+								"source": {
+									"path": "$['id']"
+								},
+								"sink": {
+									"name": "activity_id"
+								}
+							},
+							{
+								"source": {
+									"path": "$['external_id']"
+								},
+								"sink": {
+									"name": "external_id"
+								}
+							},
+							{
+								"source": {
+									"path": "$['upload_id']"
+								},
+								"sink": {
+									"name": "upload_id"
+								}
+							},
+							{
+								"source": {
+									"path": "$['start_date']"
+								},
+								"sink": {
+									"name": "start_date"
+								}
+							},
+							{
+								"source": {
+									"path": "$['start_date_local']"
+								},
+								"sink": {
+									"name": "start_date_local"
+								}
+							},
+							{
+								"source": {
+									"path": "$['timezone']"
+								},
+								"sink": {
+									"name": "timezone"
+								}
+							},
+							{
+								"source": {
+									"path": "$['utc_offset']"
+								},
+								"sink": {
+									"name": "utc_offset"
+								}
+							},
+							{
+								"source": {
+									"path": "$['start_latlng']"
+								},
+								"sink": {
+									"name": "start_latlng"
+								}
+							},
+							{
+								"source": {
+									"path": "$['end_latlng']"
+								},
+								"sink": {
+									"name": "end_latlng"
+								}
+							},
+							{
+								"source": {
+									"path": "$['location_city']"
+								},
+								"sink": {
+									"name": "location_city"
+								}
+							},
+							{
+								"source": {
+									"path": "$['location_state']"
+								},
+								"sink": {
+									"name": "location_state"
+								}
+							},
+							{
+								"source": {
+									"path": "$['location_country']"
+								},
+								"sink": {
+									"name": "location_country"
+								}
+							},
+							{
+								"source": {
+									"path": "$['start_latitude']"
+								},
+								"sink": {
+									"name": "start_latitude"
+								}
+							},
+							{
+								"source": {
+									"path": "$['start_longitude']"
+								},
+								"sink": {
+									"name": "start_longitude"
+								}
+							},
+							{
+								"source": {
+									"path": "$['achievement_count']"
+								},
+								"sink": {
+									"name": "achievement_count"
+								}
+							},
+							{
+								"source": {
+									"path": "$['kudos_count']"
+								},
+								"sink": {
+									"name": "kudos_count"
+								}
+							},
+							{
+								"source": {
+									"path": "$['comment_count']"
+								},
+								"sink": {
+									"name": "comment_count"
+								}
+							},
+							{
+								"source": {
+									"path": "$['athlete_count']"
+								},
+								"sink": {
+									"name": "athlete_count"
+								}
+							},
+							{
+								"source": {
+									"path": "$['photo_count']"
+								},
+								"sink": {
+									"name": "photo_count"
+								}
+							},
+							{
+								"source": {
+									"path": "$['map']['id']"
+								},
+								"sink": {
+									"name": "map_id"
+								}
+							},
+							{
+								"source": {
+									"path": "$['map']['summary_polyline']"
+								},
+								"sink": {
+									"name": "summary_polyline"
+								}
+							},
+							{
+								"source": {
+									"path": "$['trainer']"
+								},
+								"sink": {
+									"name": "trainer"
+								}
+							},
+							{
+								"source": {
+									"path": "$['commute']"
+								},
+								"sink": {
+									"name": "commute"
+								}
+							},
+							{
+								"source": {
+									"path": "$['manual']"
+								},
+								"sink": {
+									"name": "manual"
+								}
+							},
+							{
+								"source": {
+									"path": "$['private']"
+								},
+								"sink": {
+									"name": "private"
+								}
+							},
+							{
+								"source": {
+									"path": "$['visibility']"
+								},
+								"sink": {
+									"name": "visibility"
+								}
+							},
+							{
+								"source": {
+									"path": "$['flagged']"
+								},
+								"sink": {
+									"name": "flagged"
+								}
+							},
+							{
+								"source": {
+									"path": "$['gear_id']"
+								},
+								"sink": {
+									"name": "gear_id"
+								}
+							},
+							{
+								"source": {
+									"path": "$['from_accepted_tag']"
+								},
+								"sink": {
+									"name": "from_accepted_tag"
+								}
+							},
+							{
+								"source": {
+									"path": "$['upload_id_str']"
+								},
+								"sink": {
+									"name": "upload_id_str"
+								}
+							},
+							{
+								"source": {
+									"path": "$['average_speed']"
+								},
+								"sink": {
+									"name": "average_speed"
+								}
+							},
+							{
+								"source": {
+									"path": "$['max_speed']"
+								},
+								"sink": {
+									"name": "max_speed"
+								}
+							},
+							{
+								"source": {
+									"path": "$['average_cadence']"
+								},
+								"sink": {
+									"name": "average_cadence"
+								}
+							},
+							{
+								"source": {
+									"path": "$['average_temp']"
+								},
+								"sink": {
+									"name": "average_temp"
+								}
+							},
+							{
+								"source": {
+									"path": "$['average_watts']"
+								},
+								"sink": {
+									"name": "average_watts"
+								}
+							},
+							{
+								"source": {
+									"path": "$['kilojoules']"
+								},
+								"sink": {
+									"name": "kilojoules"
+								}
+							},
+							{
+								"source": {
+									"path": "$['device_watts']"
+								},
+								"sink": {
+									"name": "device_watts"
+								}
+							},
+							{
+								"source": {
+									"path": "$['has_heartrate']"
+								},
+								"sink": {
+									"name": "has_heartrate"
+								}
+							},
+							{
+								"source": {
+									"path": "$['average_heartrate']"
+								},
+								"sink": {
+									"name": "average_heartrate"
+								}
+							},
+							{
+								"source": {
+									"path": "$['max_heartrate']"
+								},
+								"sink": {
+									"name": "max_heartrate"
+								}
+							},
+							{
+								"source": {
+									"path": "$['heartrate_opt_out']"
+								},
+								"sink": {
+									"name": "heartrate_opt_out"
+								}
+							},
+							{
+								"source": {
+									"path": "$['display_hide_heartrate_option']"
+								},
+								"sink": {
+									"name": "display_hide_heartrate_option"
+								}
+							},
+							{
+								"source": {
+									"path": "$['elev_high']"
+								},
+								"sink": {
+									"name": "elev_high"
+								}
+							},
+							{
+								"source": {
+									"path": "$['elev_low']"
+								},
+								"sink": {
+									"name": "elev_low"
+								}
+							},
+							{
+								"source": {
+									"path": "$['pr_count']"
+								},
+								"sink": {
+									"name": "pr_count"
+								}
+							},
+							{
+								"source": {
+									"path": "$['total_photo_count']"
+								},
+								"sink": {
+									"name": "total_photo_count"
+								}
+							},
+							{
+								"source": {
+									"path": "$['has_kudoed']"
+								},
+								"sink": {
+									"name": "has_kudoed"
+								}
+							},
+							{
+								"source": {
+									"path": "$['suffer_score']"
+								},
+								"sink": {
+									"name": "suffer_score"
+								}
+							}
+						]
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "RestResource1",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ActivitiesSink",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "ActivityWorkFlow",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "GetStravaData",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "ActivityWorkFlow",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					}
+				}
+			}
+		],
+		"annotations": []
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
