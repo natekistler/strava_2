@@ -1,0 +1,35 @@
+{
+	"name": "ActivityWorkFlow",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ActivitiesSink",
+						"type": "DatasetReference"
+					},
+					"name": "ActivitySink"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "AzureStravaNate",
+						"type": "DatasetReference"
+					},
+					"name": "ActivitiesSink"
+				}
+			],
+			"transformations": [
+				{
+					"name": "ImperialConvert"
+				},
+				{
+					"name": "Select1"
+				}
+			],
+			"script": "source(output(\n\t\tresource_state as string,\n\t\tathlete as (id as string, resource_state as string),\n\t\tname as string,\n\t\tdistance as double,\n\t\tmoving_time as string,\n\t\telapsed_time as string,\n\t\ttotal_elevation_gain as double,\n\t\ttype as string,\n\t\tworkout_type as string,\n\t\tid as string,\n\t\texternal_id as string,\n\t\tupload_id as string,\n\t\tstart_date as string,\n\t\tstart_date_local as string,\n\t\ttimezone as string,\n\t\tutc_offset as double,\n\t\tstart_latlng as double[],\n\t\tend_latlng as double[],\n\t\tlocation_city as string,\n\t\tlocation_state as string,\n\t\tlocation_country as string,\n\t\tstart_latitude as double,\n\t\tstart_longitude as double,\n\t\tachievement_count as string,\n\t\tkudos_count as string,\n\t\tcomment_count as string,\n\t\tathlete_count as string,\n\t\tphoto_count as string,\n\t\tmap as (id as string, summary_polyline as string, resource_state as string),\n\t\ttrainer as boolean,\n\t\tcommute as boolean,\n\t\tmanual as boolean,\n\t\tprivate as boolean,\n\t\tvisibility as string,\n\t\tflagged as boolean,\n\t\tgear_id as string,\n\t\tfrom_accepted_tag as boolean,\n\t\tupload_id_str as string,\n\t\taverage_speed as double,\n\t\tmax_speed as double,\n\t\taverage_cadence as double,\n\t\taverage_temp as string,\n\t\taverage_watts as double,\n\t\tkilojoules as double,\n\t\tdevice_watts as boolean,\n\t\thas_heartrate as boolean,\n\t\taverage_heartrate as double,\n\t\tmax_heartrate as double,\n\t\theartrate_opt_out as boolean,\n\t\tdisplay_hide_heartrate_option as boolean,\n\t\telev_high as double,\n\t\telev_low as double,\n\t\tpr_count as string,\n\t\ttotal_photo_count as string,\n\t\thas_kudoed as boolean,\n\t\tsuffer_score as double\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> ActivitySink\nSelect1 derive(distance = distance * 0.000621371,\n\t\ttotal_elevation_gain = total_elevation_gain * 3.2808388799999997,\n\t\telev_low = elev_low * 3.2808388799999997,\n\t\telev_high = elev_high * 3.2808388799999997,\n\t\tmax_speed = max_speed * 2.23694,\n\t\taverage_speed = average_speed * 2.23694) ~> ImperialConvert\nActivitySink select(mapColumn(\n\t\tathlete_id = athlete.id,\n\t\tname,\n\t\tdistance,\n\t\tmoving_time,\n\t\telapsed_time,\n\t\ttotal_elevation_gain,\n\t\ttype,\n\t\tworkout_type,\n\t\tactivity_id = id,\n\t\texternal_id,\n\t\tupload_id,\n\t\tstart_date,\n\t\tstart_date_local,\n\t\ttimezone,\n\t\tutc_offset,\n\t\tlocation_city,\n\t\tlocation_state,\n\t\tlocation_country,\n\t\tstart_latitude,\n\t\tstart_longitude,\n\t\tachievement_count,\n\t\tkudos_count,\n\t\tcomment_count,\n\t\tathlete_count,\n\t\tphoto_count,\n\t\tmap_id = map.id,\n\t\tmap_summary_polyline = map.summary_polyline,\n\t\ttrainer,\n\t\tcommute,\n\t\tmanual,\n\t\tprivate,\n\t\tvisibility,\n\t\tflagged,\n\t\tgear_id,\n\t\tfrom_accepted_tag,\n\t\tupload_id_str,\n\t\taverage_speed,\n\t\tmax_speed,\n\t\taverage_cadence,\n\t\taverage_temp,\n\t\taverage_watts,\n\t\tkilojoules,\n\t\tdevice_watts,\n\t\thas_heartrate,\n\t\taverage_heartrate,\n\t\tmax_heartrate,\n\t\theartrate_opt_out,\n\t\tdisplay_hide_heartrate_option,\n\t\telev_high,\n\t\telev_low,\n\t\tpr_count,\n\t\ttotal_photo_count,\n\t\thas_kudoed,\n\t\tsuffer_score\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select1\nImperialConvert sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> ActivitiesSink"
+		}
+	}
+}
